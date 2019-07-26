@@ -1,4 +1,4 @@
-FROM jenkins/jenkins:lts
+FROM jenkinsci/blueocean:1.18.0
 
 ARG http_port=8080
 ARG agent_port=50000
@@ -6,23 +6,31 @@ ARG agent_port=50000
 USER root
 WORKDIR /tmp
 
-# Install dependencies for AWS CLI tools
-RUN apt-get update && apt-get install -y \
-    gcc make zlib1g-dev libffi-dev libbz2-dev libreadline-dev libssl-dev
+RUN apk update
+
 
 # Install MySQL client as root user
-RUN apt-get update && apt-get install -y mysql-client
+RUN apk add mysql-client
+
 
 # Install pip for AWS CLI as root user
+RUN apk add python
 RUN curl -O https://bootstrap.pypa.io/get-pip.py && \
     python get-pip.py
 
 # Install AWS CLI tool as root user
 RUN pip install awscli --upgrade
 
+
 # Install AWS ECS CLI tool as root user
 RUN curl -o /usr/local/bin/ecs-cli https://amazon-ecs-cli.s3.amazonaws.com/ecs-cli-linux-amd64-latest && \
     chmod a+x /usr/local/bin/ecs-cli
+
+
+# Install dependencies for AWS EB CLI tools
+RUN apk add --no-cache \
+    alpine-sdk autoconf automake libtool linux-headers \
+    zlib-dev libffi-dev openssl-dev readline-dev bzip2-dev
 
 # Install AWS EB CLI tool as jenkins user
 # EB CLI is installed to `jenkins` user's home directory, which is declared as
@@ -54,4 +62,3 @@ WORKDIR /var/jenkins_home
 EXPOSE ${http_port}
 EXPOSE ${agent_port}
 ENTRYPOINT ["/usr/local/bin/jenkins_extd.sh"]
-#ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/jenkins.sh"]
