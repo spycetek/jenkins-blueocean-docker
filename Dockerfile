@@ -1,4 +1,4 @@
-FROM jenkinsci/blueocean:1.18.0
+FROM jenkinsci/blueocean:1.18.1
 
 ARG http_port=8080
 ARG agent_port=50000
