@@ -10,11 +10,11 @@ RUN apk update
 
 
 # Install MySQL client as root user
-RUN apk add mysql-client
+RUN apk add --no-cache mysql-client
 
 
 # Install pip for AWS CLI as root user
-RUN apk add python
+RUN apk add --no-cache python
 RUN curl -O https://bootstrap.pypa.io/get-pip.py && \
     python get-pip.py
 
